@@ -15,11 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     var window: UIWindow?
     
-    // payload
-    var payloadKeyData: Array<String> = []
-    var payloadValueData: Array<String> = []
-    var payload_flag = false
-    
     // APIキーの設定
     let applicationkey = "YOUR_NCMB_APPLICATIONKEY"
     let clientkey      = "YOUR_NCMB_CLIENTKEY"
@@ -54,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             application.registerForRemoteNotifications()
         }
         
-        // アプリ起動時にプッシュ通知の情報を取得する
+        // MARK: アプリが起動されるときに実行される処理を追記する場所
         if let userInfo = launchOptions?[UIApplicationLaunchOptionsKey.remoteNotification] as! [AnyHashable : Any]! {
             // リッチプッシュを表示させる処理
             NCMBPush.handleRichPush(userInfo)
@@ -83,7 +78,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
     }
     
-    // アプリが起動中にプッシュ通知の情報を取得する
+    // MARK: アプリが起動しているときに実行される処理を追記する場所
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         // リッチプッシュを表示させる処理
         NCMBPush.handleRichPush(userInfo)
