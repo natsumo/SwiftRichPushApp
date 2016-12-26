@@ -1,4 +1,4 @@
-# 【Swift iOS10】プッシュ通知受信時にWebページを表示しよう<br>（リッチプッシュ）
+# 【Swift iOS10】<br>プッシュ通知受信時にWebViewを表示しよう(リッチプッシュ)
 *2016/10/26作成*
 
 ![画像1](/readme-img/001.png)
@@ -281,4 +281,4 @@ iOS9以降の端末ではhttps通信でないとリッチプッシュのWebView�
 
 ## 参考
 * 他にもさまざまなサンプルアプリを作っていますのでよろしければ見てください～
- * __https://github.com/natsumo __
+ * __https://github.com/natsumo__
