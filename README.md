@@ -1,4 +1,4 @@
-# 【Swift iOS10】<br>プッシュ通知受信時にWebViewを表示しよう(リッチプッシュ)
+# 【iOS(Swift)】<br>プッシュ通知受信時にWebViewを表示しよう(リッチプッシュ)
 *20230106更新*
 
 ![リッチプッシュ](/readme-img/RichPush.png)
