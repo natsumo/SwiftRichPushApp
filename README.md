@@ -147,7 +147,7 @@ SDKの導入はCarthage利用しています。
 
 * ニフクラ mobile backend の[ドキュメント（クイックスタート）](https://mbaas.nifcloud.com/doc/current/introduction/quickstart_swift.html)
 
-#### プッシュ通知機能の実装
+#### プッシュ通知機能の実装と設定
 * `AppDelegate.swift`の`didFinishLaunchingWithOptions`メソッドにAPNsに対してデバイストークンの要求するコードを記述し、デバイストークンが取得された後に呼び出される`didRegisterForRemoteNotificationsWithDeviceToken`メソッドを追記をします
 
 ```swift
@@ -211,10 +211,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 ```
 
-#### リッチプッシュの取得
-* 上記デバイストークン処理のコードに加え、２箇所（処理を実行するタイミング）にそれぞれに下記のコードを追記しています
+* Xcodeでプロジェクトを選択して、「Signing & Capabilities」を開きます
+* 「+Capability」をクリックして、検索欄に「Push Notifications」と入力し追加します
 
-##### __アプリが起動されるときプッシュ通知を開封する場合__
+#### リッチプッシュの実装と設定
+上記デバイストークン処理のコードに加え、２箇所（処理を実行するタイミング）にコードの追加と追加で設定をが必要です。
+
+##### コード追記： __アプリが起動されるときプッシュ通知を開封する場合__
 * アプリが起動されるときプッシュ通知を開封するる場合の処理は、`didFinishLaunchingWithOptions`メソッド内に記述します
 
 ```swift
@@ -224,7 +227,7 @@ if let notification = launchOptions?[.remoteNotification] as? [String: AnyObject
 }
 ```
 
-##### __アプリが起動しているときプッシュ通知を開封する場合__
+##### コード追記： __アプリが起動しているときプッシュ通知を開封する場合__
 * アプリが起動しているとき起動中に開封するため、`didReceiveRemoteNotification`メソッドを追記し、記述します
 
 ```swift
@@ -314,3 +317,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // 以下省略
 }
 ```
+
+##### 追加設定
+* Xcodeでプロジェクトを選択して、「Signing & Capabilities」を開きます
+* 「+Capability」をクリックして、検索欄に「Background Modes」と入力し追加します
+* 追加後、「Remote notifications」にチェックを入れ有効にします
