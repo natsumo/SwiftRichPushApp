@@ -1,284 +1,326 @@
-# 【Swift iOS10】<br>プッシュ通知受信時にWebViewを表示しよう(リッチプッシュ)
-*2016/10/26作成*
+# 【iOS(Swift)】<br>プッシュ通知受信時にWebViewを表示しよう(リッチプッシュ)
+*20230126更新*
 
-![画像1](/readme-img/001.png)
+![リッチプッシュ](/readme-img/RichPush.png)
 
 ## 概要
-* [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)の『プッシュ通知』機能において、プッシュ通知にURLを設定し配信できる『リッチプッシュ』機能を実装したサンプルプロジェクトです
-* リッチプッシュ機能を使うと、プッシュ通知にURLを設定し配信を行った場合、ユーザープッシュ通知を開封する際にWebViewとして表示することが可能です
-* 簡単な操作ですぐに [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)の機能を体験いただけます★☆
-* このサンプルはiOS10に対応しています
- * iOS8以上でご利用いただけます
+Xcode（Swift）で作成したネイティブアプリにニフクラ mobile backendの『プッシュ通知』機能の１つで、プッシュ通知にURLを設定し配信できる『リッチプッシュ』機能を実装したサンプルプロジェクトです。リッチプッシュ機能を使うと、ユーザーがプッシュ通知を開封する際に、画面に指定したWebページを「WebView」で表示させることが可能です
 
-## ニフティクラウドmobile backendって何？？
-スマートフォンアプリのバックエンド機能（プッシュ通知・データストア・会員管理・ファイルストア・SNS連携・位置情報検索・スクリプト）が**開発不要**、しかも基本**無料**(注1)で使えるクラウドサービス！
+## ニフクラ mobile backend とは
 
-注1：詳しくは[こちら](http://mb.cloud.nifty.com/price.htm)をご覧ください
+https://mbaas.nifcloud.com/
 
-![画像2](/readme-img/002.png)
+スマートフォンアプリのバックエンド機能（プッシュ通知・データストア・会員管理・ファイルストア・SNS連携・位置情報検索・スクリプト）が**開発不要**、**無料**(注1)から使えるクラウドサービスです。
+
+注1：詳しくは[こちら](https://mbaas.nifcloud.com/price.htm)をご覧ください
 
 ## 動作環境
-* macOS Sierra 10.12
-* Xcode ver. 8.0
-* iPhone6 ver. 10.0.1
- * このサンプルアプリは、プッシュ通知を受信する必要があるため実機ビルドが必要です
 
-※上記内容で動作確認をしています
+プロジェクトに組み込んでいるニフクラ mobile backendのSDKのバージョンはドキュメント更新時点で最新の __v1.3.1__ です。このバージョンでの動作環境は下記です。
 
-## プッシュ通知の仕組み
-* ニフティクラウドmobile backendのプッシュ通知は、iOSが提供している通知サービスを利用しています
- * iOSの通知サービス　__APNs（Apple Push Notification Service）__
+* Swift version 4.2, 5.x
+* iOS 13.x ～ iOS 16.x
+* Xcode 13.2.1 〜 Xcode 14.x
+* armv7k, arm64, arm64e アーキテクチャ
 
- ![画像10](/readme-img/010.png)
+SDKのバージョンアップを行う場合は[こちら（参考：SDKのアップデートについて）](https://mbaas.nifcloud.com/doc/current/introduction/quickstart_swift.html#Carthage%E3%82%92%E5%88%A9%E7%94%A8%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95)を参考に更新をお願いします。また、最新のSDKバージョン及び動作環境については[mobile backend Swift SDK | GitHub](https://github.com/NIFCLOUD-mbaas/ncmb_swift)をご参照ください。
+プロジェクト作成時に動作検証を行った端末情報も併せて記載しておきます。
 
-* 上図のように、アプリ（Xcode）・サーバー（ニフティクラウドmobile backend）・通知サービス（APNs）の間でやり取りを行うため、認証が必要になります
- * 認証に必要な鍵や証明書の作成は作業手順の「0.プッシュ通知機能使うための準備」で行います
+* macOS Monterey 12.6.1
+* Xcode 14.0.1
+* iOS 15.7 (iPhone 11 Pro)
 
-## 作業の手順
-### 0.プッシュ通知機能使うための準備
-__[【iOS】プッシュ通知の受信に必要な証明書の作り方(開発用)](https://github.com/natsumo/iOS_Certificate)__
-* 上記のドキュメントをご覧の上、必要な証明書類の作成をお願いします
- * 証明書の作成には[Apple Developer Program](https://developer.apple.com/account/)の登録（有料）が必要です
+※プッシュ通知の動作検証には実機ビルドが必須です
 
-![画像i002](/readme-img/i002.png)
+## サンプルプロジェクトの使い方・作業手順
+### 0.プッシュ通知機能を使うための準備
 
-### 1. [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)の会員登録とログイン→アプリ作成と設定
-* 上記リンクから会員登録（無料）をします。登録ができたらログインをすると下図のように「アプリの新規作成」画面が出るのでアプリを作成します
+* ニフクラ mobile backendのプッシュ通知は、iOSが提供している通知サービス（APNs（Apple Push Notification Service））を利用しています
+* APNsを利用するには証明書を利用した認証が必要です
+* 下記のドキュメントをご覧の上、認証に必要な証明書類の作成をします
+  * [プッシュ通知に必要な証明書の作り方 | Qiita](https://qiita.com/natsumo/items/d5cc1d0be427ca3af1cb)
+  * なお証明書の作成には[Apple Developer Program](https://developer.apple.com/account/)の登録（有料）が必要です
 
-![画像3](/readme-img/003.png)
+### 1. ニフクラ mobile backendの会員登録（無料）とログイン及びアプリ作成
+* 下記リンクからニフクラ mobile backendの会員登録（無料：SNS ID）、ログインをします
+  * https://console.mbaas.nifcloud.com/signup
+* 「アプリの新規作成」画面（既にアプリを作成済みの場合は「+新しいアプリ」をクリックする）でアプリ名（例：SwiftPushApp）を入力しアプリを作成します
+* アプリが作成されるとAPIキー（２種類）が発行されます
+* APIキー（アプリケーションキーとクライアントキー）はこの後、「3. APIキーの設定」でXcodeにインポートするサンプルアプリ上で使用します
+* 「OK」をクリックするとダッシュボードが表示されます
+* 右上の「アプリ設定」をクリックし、「プッシュ通知」を開きます
+* 「プッシュ通知」＞「プッシュ通知の許可」で「許可する」を選択し、「保存する」をクリックします
+* 「iOSプッシュ通知(p12)」＞「証明書（p12）」の「証明書の選択」ボタンをクリックして「0.プッシュ通知機能を使うための準備」で作成した「⑦APNs用証明書(.p12)」を選択、「アップロード」ボタンをクリックして設定します
+  * 「証明書は設定されています。」と表示されればOKです
 
-* アプリ作成されると下図のような画面になります
-* この２種類のAPIキー（アプリケーションキーとクライアントキー）はXcodeで作成するiOSアプリに[ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)を紐付けるために使用します
+### 2. サンプルプロジェクトのダウンロード
+* 下記リンクをクリックしてプロジェクトをダウンロードします
+  * https://github.com/NIFCLOUD-mbaas/SwiftRichPushApp/archive/master.zip
 
-![画像4](/readme-img/004.png)
+### 3. Xcodeでプロジェクトを起動
 
-* 続けてプッシュ通知の設定を行います
-* ここで⑦APNs用証明書(.p12)の設定も行います
-
-![画像5](/readme-img/005.png)
-
-### 2. [GitHub](https://github.com/natsumo/SwiftPushApp.git)からサンプルプロジェクトのダウンロード
-
-* 下記リンクをクリックしてプロジェクトをダウンロードをMacにダウンロードします
-
- * __[SwiftRichPushApp](https://github.com/natsumo/SwiftRichPushApp/archive/master.zip)__
-
-### 3. Xcodeでアプリを起動
-
-* ダウンロードしたフォルダを開き、「__SwiftRichPushApp.xcworkspace__」をダブルクリックしてXcode開きます(白い方です)
-
-![画像09](/readme-img/009.png)
-![画像06](/readme-img/006.png)
-
-* 「SwiftRichPushApp.xcodeproj」（青い方）ではないので注意してください！
-
-![画像08](/readme-img/008.png)
+* ダウンロードしたフォルダを開き、「__SwiftRichPushApp.xcodeproj__」をダブルクリックしてXcodeでプロジェクトを起動します
 
 ### 4. APIキーの設定
-
-* `AppDelegate.swift`を編集します
-* 先程[ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)のダッシュボード上で確認したAPIキーを貼り付けます
-
-![画像07](/readme-img/007.png)
-
-* それぞれ`YOUR_NCMB_APPLICATION_KEY`と`YOUR_NCMB_CLIENT_KEY`の部分を書き換えます
- * このとき、ダブルクォーテーション（`"`）を消さないように注意してください！
+* SwiftPushApp フォルダ配下の `AppDelegate.swift`を編集します
+* 先程ニフクラ mobile backendのダッシュボード上で確認したAPIキー、それぞれ`YOUR_APPLICATION_KEY`と`YOUR_CLIENT_KEY`の部分に貼り、書き換えます
+  * APIキーは、ニフクラ mobile backend管理画面、右上の「アプリ設定」から確認できます
+  * １つずつコピーボタンでコピーして貼り付けてください
+  * このとき、ダブルクォーテーション（`"`）を消さないように注意してください
 * 書き換え終わったら`command + s`キーで保存をします
 
 ### 5. 実機ビルド
-* 始めて実機ビルドをする場合は、Xcodeにアカウント（AppleID）の登録をします
- * メニューバーの「Xcode」＞「Preferences...」を選択します
- * Accounts画面が開いたら、左下の「＋」をクリックします。
- * Apple IDとPasswordを入力して、「Add」をクリックします
+始めて実機ビルドをする場合は、Xcodeにアカウント（Apple ID）の登録をします。
 
- ![画像i29](/readme-img/i029.png)
+* メニューバーの「Xcode」＞「Preferences...」＞「Accounts」を選択します
+* 左下の「＋」＞「Apple ID」をクリックします
+* 「Apple ID」を入力して「Next」、「Password」を入力して「Next」をクリックすると追加されます
+  * 認証のためコードを要求された場合は従ってください
+* 追加されたらこの画面は閉じます
 
- * 追加されると、下図のようになります。追加した情報があっていればOKです
- * 確認できたら閉じます。
+ビルドに必要な設定をしていきます。
 
- ![画像i30](/readme-img/i030.png)
+* プロジェクトを選択して、「Signing & Capabilities」を開きます
+* 「0.プッシュ通知機能を使うための準備」で作成した「②開発用ビルド証明書(.cer)」と「⑤プロビジョニングプロファイル」を設定します
+  * あらかじめ「②開発用ビルド証明書(.cer)」と「⑤プロビジョニングプロファイル」はダブルクリックをし、キーチェーンアクセスと紐づけておきましょう
+* 「Team」で「Apple ID」を選択し、「Bundle IdentiIdentier」に「0.プッシュ通知機能を使うための準備」で作成した「③AppID」を記入します
+* 無事連携されれば「Provisioning Profile」、「Signing Certificate」が表示されます
 
-* 「TARGETS」 ＞「General」を開きます
+![画像i01](/readme-img/i01.png)
 
-![画像14](/readme-img/014.png)
+実機にビルドします。
 
-* 「Identity」＞「Bundle Identifier」を入力します
- * 「Bundle Identifier」にはAppID作成時に指定した「Bundle ID」を入力してください
-* 「Signing(Debug)」＞「Provisioning Profile」を設定します
- * 今回使用するプロビジョニングプロファイルをプルダウンから選択します
- * プロビジョニングプロファイルはダウンロードしたものを一度__ダブルクリック__して認識させておく必要があります（プルダウンに表示されない場合はダブルクリックを実施後設定してください）
- * 選択すると以下のようになります
- ![画像15](/readme-img/015.png)
+* 「0.プッシュ通知機能を使うための準備」の「④端末の登録」で登録した、動作確認用iPhoneをMacにつなぎます
+  * iOS16以上でテストアプリをビルドする場合、iPhone（端末側）の設定で「デベロッパモード」を有効にする必要があります
+  * 「設定」＞「プライバシーとセキュリティ」＞「デベロッパモード」をONにしてから実行してください
+* 接続したiPhoneを選び、実行ボタン（さんかくの再生マーク）をクリックします
+  * iOSのバージョンが一致せずビルドエラーとなる場合は、「General」＞「Minimum Deployments」で対象OSを変更してください
 
-* 「TARGETS」＞「Capabilities」を開き、「Push Notifications」を__ON__に設定します
- * 設定すると以下のようになります
- ![画像16](/readme-img/016.png)
-
-* 設定は完了です
-* lightningケーブルで登録した動作確認用iPhoneをMacにつなぎます
-* Xcode画面で左上で、接続したiPhoneを選び、実行ボタン（さんかくの再生マーク）をクリックします
+![画像i02](/readme-img/i02.png)
 
 ### 6.動作確認
-* インストールしたアプリを起動します
- * プッシュ通知の許可を求めるアラートが出たら、必ず許可してください！
-* 起動されたらこの時点でデバイストークンが取得されます
-* [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)のダッシュボードで「データストア」＞「installation」クラスを確認してみましょう！
+* ビルドされたアプリは自動で起動します
+* プッシュ通知の許可を求めるアラートが出るので、必ず許可します
+  * 許可しないとプッシュ通知が届きません
+* この時点でデバイストークンがAPNsから取得され、ニフクラ mobile backendに保存されます
+  * 正しく保存されると、Xcode側にログ（`保存に成功しました`）が出力されます
+* ニフクラ mobile backendの管理画面から「データストア」＞「installation」クラスを確認してみましょう
 
-![画像12](/readme-img/012.png)
+![画像i03](/readme-img/i03.png)
 
-### 7.リッチプッシュを送ってWebViewを表示させましょう
-* 動作確認のため、アプリを完全に閉じておきましょう
-* [ニフティクラウドmobile backend](http://mb.cloud.nifty.com/)のダッシュボードで「プッシュ通知」＞「＋新しいプッシュ通知」をクリックします
+* 端末側で起動したアプリは一度閉じて（完全に終了して）おきます
+
+### 7.プッシュ通知を送りましょう
+
+実際にプッシュ通知を送ってみましょう
+
+* ニフクラ mobile backend のダッシュボードで「プッシュ通知」＞「＋新しいプッシュ通知」をクリックします
 * プッシュ通知のフォームが開かれます
-* タイトル、メッセージ、__URL__ を入力してプッシュ通知を作成します
+* 必要な項目を入力してプッシュ通知を作成します
+* リッチプッシュを配信するには、
+  * 必ず有効なURLを「URL」に入力してください
+  * 必ず「content-available」を「有効にする」してください
 
-![画像11](/readme-img/011.png)
+![画像i05](/readme-img/i05.png)
 
-* 端末を確認しましょう！
-* アプリの状態により、WebView（リッチプッシュ）の表示のされ方は以下のようになります
+* 端末を確認しましょう
+* 少し待つとプッシュ通知が届くので、届いたプッシュ通知をタップしてアプリを開くとWebビューが表示され、設定したURLのページが表示されます
+
+![リッチプッシュ](/readme-img/RichPush.png) 
+
+アプリの状態により、WebView（リッチプッシュ）の表示のされ方は以下のようになります。なお、いずれも表示されたWebViewを閉じるには、画面下の「Close」をタップします。（リッチプッシュによって表示されるWebViewは一度い閉じると再表示できません）
 
 #### アプリが起動していないときプッシュ通知を受信した場合
-* アプリを__完全に閉じた状態__でプッシュ通知を送った場合は、プッシュ通知が受信されます
+* アプリを __完全に閉じた状態（Kill）__ でプッシュ通知を送った場合は、プッシュ通知が受信されます
 * 受信したプッシュ通知をタップするとWebViewが画面に表示されます
-* 画面下の「Close」をタップするとWebViewが閉じ、裏で起動していたアプリが表示されます
- * リッチプッシュによって表示されるWebViewは一度い閉じると再表示できません。
-
-![画像1](/readme-img/001.png)
 
 #### アプリが起動しているときプッシュ通知を受信した場合
-* アプリを起動している（画面に表示中/バックグラウンド起動中）状態でプッシュ通知を送った場合は、プッシュ通知自体は__表示されません__！（iOSの仕様）ただし、プッシュ通知が受信できていないわけではなく、正しく配信されていれば、WebViewが画面に表示されます
+* アプリを起動している（画面に表示中）状態でプッシュ通知を送った場合は、プッシュ通知自体は __表示されません__ ！（iOSの仕様）
+  * 起動中のアプリの画面にWebViewが画面に表示されます
+* アプリを起動している（バックグラウンド起動中）状態でプッシュ通知を送った場合は、プッシュ通知が受信されます
+  * 受信したプッシュ通知をタップするか、バックグラウンドからアプリを最前面に表示するとWebViewが画面を確認できます
 
 ## 解説
-### SDKのインポートと初期設定
-* ニフティクラウドmobile backend の[ドキュメント（クイックスタート）](http://mb.cloud.nifty.com/doc/current/introduction/quickstart_ios.html)をSwift版に書き換えたドキュメントをご用意していますので、ご活用ください
- * [SwiftでmBaaSを始めよう！(＜CocoaPods＞でuse_framewoks!を有効にした方法)](http://qiita.com/natsumo/items/57d3a4d9be16b0490965)
+サンプルプロジェクトに実装済みの内容のご紹介します。
 
-### コード紹介
-#### デバイストークン取得とニフティクラウドmobile backendへの保存
- * `AppDelegate.swift`の`didFinishLaunchingWithOptions`メソッドにAPNsに対してデバイストークンの要求するコードを記述し、デバイストークンが取得された後に呼び出される`didRegisterForRemoteNotificationsWithDeviceToken`メソッドを追記をします
- * デバイストークンの要求はiOSのバージョンによってコードが異なります
+#### SDKのインポートと初期設定
+
+SDKの導入はCarthage利用しています。
+
+* ニフクラ mobile backend の[ドキュメント（クイックスタート）](https://mbaas.nifcloud.com/doc/current/introduction/quickstart_swift.html)
+
+#### プッシュ通知機能の実装と設定
+* `AppDelegate.swift`の`didFinishLaunchingWithOptions`メソッドにAPNsに対してデバイストークンの要求するコードを記述し、デバイストークンが取得された後に呼び出される`didRegisterForRemoteNotificationsWithDeviceToken`メソッドを追記をします
 
 ```swift
 //
 //  AppDelegate.swift
-//  SwiftPushApp_
+//  SwiftPushApp
 //
-//  Created by Ikeda Natsumo on 2016/12/08.
-//  Copyright © 2016年 NIFTY Corporation. All rights reserved.
+//  Created by ikeda.natsumo on 2023/01/06.
 //
+
 import UIKit
 import NCMB
 import UserNotifications
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    var window: UIWindow?
-
-    // APIキーの設定
-    let applicationkey = "YOUR_NCMB_APPLICATIONKEY"
-    let clientkey      = "YOUR_NCMB_CLIENTKEY"
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-
-        // SDKの初期化
-        NCMB.setApplicationKey(applicationkey, clientKey: clientkey)
-
-        // デバイストークンの要求
-        if #available(iOS 10.0, *){
-            /** iOS10以上 **/
-            let center = UNUserNotificationCenter.current()
-            center.requestAuthorization(options: [.alert, .badge, .sound]) {granted, error in
-                if error != nil {
-                    // エラー時の処理
-                    return
-                }
-                if granted {
-                    // デバイストークンの要求
+        
+        // APIキーの設定とSDK初期化
+        NCMB.initialize(applicationKey: "YOUR_APPLICATION_KEY", clientKey: "YOUR_CLIENT_KEY")
+        
+        // APNsにデバイストークンを要求
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
+            if((error) != nil) {
+                return
+            }
+            if granted {
+                DispatchQueue.main.async {
                     UIApplication.shared.registerForRemoteNotifications()
                 }
             }
-        } else {
-            /** iOS8以上iOS10未満 **/
-            //通知のタイプを設定したsettingを用意
-            let setting = UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-            //通知のタイプを設定
-            application.registerUserNotificationSettings(setting)
-            //DevoceTokenを要求
-            application.registerForRemoteNotifications()
         }
-
-        // MARK: アプリが起動されるときに実行される処理を追記する場所
-
+        
         return true
     }
-
-    // デバイストークンが取得されたら呼び出されるメソッド
+    
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        // 端末情報を扱うNCMBInstallationのインスタンスを作成
-        let installation : NCMBInstallation = NCMBInstallation.current()
-        // デバイストークンの設定
-        installation.setDeviceTokenFrom(deviceToken)
-        // 端末情報をデータストアに登録
-        installation.saveInBackground {error in
-            if error != nil {
-                // 端末情報の登録に失敗した時の処理
-                let err = error as! NSError
-                print("端末登録失敗：\(err.code)")
-            } else {
-                // 端末情報の登録に成功した時の処理
-                print("端末登録成功")
+        //端末情報を扱うNCMBInstallationのインスタンスを作成
+        let installation : NCMBInstallation = NCMBInstallation.currentInstallation
+
+        //Device Tokenを設定
+        installation.setDeviceTokenFromData(data: deviceToken)
+
+        //端末情報をデータストアに登録
+        installation.saveInBackground(callback: { result in
+            switch result {
+            case .success:
+                //端末情報の登録が成功した場合の処理
+                print("保存に成功しました")
+            case let .failure(error):
+                //端末情報の登録が失敗した場合の処理
+                print("保存に失敗しました: \(error)")
+                return;
             }
-        }
+        })
     }
 
-    // MARK: アプリが起動しているときに実行される処理を追記する場所
+// 以下省略
 }
 ```
 
-#### リッチプッシュの取得
-* 上記デバイストークン処理のコードに加え、コメント（`// MARK:`）の２箇所（処理を実行するタイミング）にそれぞれに下記のコードを追記する必要があります
+* Xcodeでプロジェクトを選択して、「Signing & Capabilities」を開きます
+* 「+Capability」をクリックして、検索欄に「Push Notifications」と入力し追加します
 
-##### __アプリが起動されるときプッシュ通知を開封する場合__
+#### リッチプッシュの実装と設定
+上記デバイストークン処理のコードに加え、２箇所（処理を実行するタイミング）にコードの追加と追加で設定をが必要です。
+
+##### コード追記： __アプリが起動されるときプッシュ通知を開封する場合__
 * アプリが起動されるときプッシュ通知を開封するる場合の処理は、`didFinishLaunchingWithOptions`メソッド内に記述します
 
 ```swift
-// MARK: アプリが起動されるときに実行される処理を追記する場所
-if let userInfo = launchOptions?[UIApplicationLaunchOptionsKey.remoteNotification] as! [AnyHashable : Any]! {
-    // リッチプッシュを表示させる処理
-    NCMBPush.handleRichPush(userInfo)
+// MARK: リッチプッシュ通知を表示させる
+if let notification = launchOptions?[.remoteNotification] as? [String: AnyObject] {
+        NCMBPush.handleRichPush(userInfo: notification)
 }
 ```
 
-##### __アプリが起動しているときプッシュ通知を開封する場合__
+##### コード追記： __アプリが起動しているときプッシュ通知を開封する場合__
 * アプリが起動しているとき起動中に開封するため、`didReceiveRemoteNotification`メソッドを追記し、記述します
 
 ```swift
-// MARK: アプリが起動しているときに実行される処理を追記する場所
-func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    // リッチプッシュを表示させる処理
-    NCMBPush.handleRichPush(userInfo)
+// プッシュ通知を受信したときの処理
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],fetchCompletionHandler completionHandler:@escaping (UIBackgroundFetchResult) -> Void) {
+    if let notiData = userInfo as? [String : AnyObject] {
+        // MARK: リッチプッシュ通知を表示させる
+        NCMBPush.handleRichPush(userInfo: notiData)
+    }
 }
 ```
 
-#### iOS9以上におけるhttp通信設定
-iOS9以降の端末ではhttps通信でないとリッチプッシュのWebViewで画像を表示することができません。そのためhttps通信の許可設定をする必要があります。
+（参考）実装完了した `AppDelegate.swift`
 
-* `Info.plist`に下記を追記します
+```swift
+//
+//  AppDelegate.swift
+//  SwiftRichPushApp
+//
+//  Created by ikeda.natsumo on 2023/01/06.
+//
 
-![画像18](/readme-img/018.png)
+import UIKit
+import NCMB
+import UserNotifications
 
-* コードの場合は以下のように設定します
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
 
-```plist:Info.plist
-<key>NSAppTransportSecurity</key>
-<dict>
-    <key>NSAllowsArbitraryLoads</key>
-    <true/>
-</dict>
+
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Override point for customization after application launch.
+        
+        // APIキーの設定とSDK初期化
+        NCMB.initialize(applicationKey: "YOUR_APPLICATION_KEY", clientKey: "YOUR_CLIENT_KEY")
+        
+        // APNsにデバイストークンを要求
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
+            if((error) != nil) {
+                return
+            }
+            if granted {
+                DispatchQueue.main.async {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+        }
+        
+        // MARK: リッチプッシュ通知を表示させる
+        if let notification = launchOptions?[.remoteNotification] as? [String: AnyObject] {
+                NCMBPush.handleRichPush(userInfo: notification)
+        }
+        
+        return true
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        //端末情報を扱うNCMBInstallationのインスタンスを作成
+        let installation : NCMBInstallation = NCMBInstallation.currentInstallation
+
+        //Device Tokenを設定
+        installation.setDeviceTokenFromData(data: deviceToken)
+
+        //端末情報をデータストアに登録
+        installation.saveInBackground(callback: { result in
+            switch result {
+            case .success:
+                //端末情報の登録が成功した場合の処理
+                print("保存に成功しました")
+            case let .failure(error):
+                //端末情報の登録が失敗した場合の処理
+                print("保存に失敗しました: \(error)")
+                return;
+            }
+        })
+    }
+    
+    // プッシュ通知を受信したときの処理
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any],fetchCompletionHandler completionHandler:@escaping (UIBackgroundFetchResult) -> Void) {
+        if let notiData = userInfo as? [String : AnyObject] {
+            // MARK: リッチプッシュ通知を表示させる
+            NCMBPush.handleRichPush(userInfo: notiData)
+        }
+    }
+
+// 以下省略
+}
 ```
 
-## 参考
-* 他にもさまざまなサンプルアプリを作っていますのでよろしければ見てください～
- * __https://github.com/natsumo__
+##### 追加設定
+* Xcodeでプロジェクトを選択して、「Signing & Capabilities」を開きます
+* 「+Capability」をクリックして、検索欄に「Background Modes」と入力し追加します
+* 追加後、「Remote notifications」にチェックを入れ有効にします
