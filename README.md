@@ -44,7 +44,7 @@ SDKのバージョンアップを行う場合は[こちら（参考：SDKのア�
 ### 1. ニフクラ mobile backendの会員登録（無料）とログイン及びアプリ作成
 * 下記リンクからニフクラ mobile backendの会員登録（無料：SNS ID）、ログインをします
   * https://console.mbaas.nifcloud.com/signup
-* 「アプリの新規作成」画面（既にアプリを作成済みの場合は「+新しいアプリ」をクリックする）でアプリ名（例：SwiftPushApp）を入力しアプリを作成します
+* 「アプリの新規作成」画面（既にアプリを作成済みの場合は「+新しいアプリ」をクリックする）でアプリ名（例：SwiftRichPushApp）を入力しアプリを作成します
 * アプリが作成されるとAPIキー（２種類）が発行されます
 * APIキー（アプリケーションキーとクライアントキー）はこの後、「3. APIキーの設定」でXcodeにインポートするサンプルアプリ上で使用します
 * 「OK」をクリックするとダッシュボードが表示されます
@@ -62,7 +62,7 @@ SDKのバージョンアップを行う場合は[こちら（参考：SDKのア�
 * ダウンロードしたフォルダを開き、「__SwiftRichPushApp.xcodeproj__」をダブルクリックしてXcodeでプロジェクトを起動します
 
 ### 4. APIキーの設定
-* SwiftPushApp フォルダ配下の `AppDelegate.swift`を編集します
+* SwiftRichPushApp フォルダ配下の `AppDelegate.swift`を編集します
 * 先程ニフクラ mobile backendのダッシュボード上で確認したAPIキー、それぞれ`YOUR_APPLICATION_KEY`と`YOUR_CLIENT_KEY`の部分に貼り、書き換えます
   * APIキーは、ニフクラ mobile backend管理画面、右上の「アプリ設定」から確認できます
   * １つずつコピーボタンでコピーして貼り付けてください
